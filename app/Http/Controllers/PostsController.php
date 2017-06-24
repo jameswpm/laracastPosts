@@ -7,14 +7,23 @@ use Illuminate\Http\Request;
 
 class PostsController extends Controller
 {
-    public function index()
+    public function __construct()
     {
-        return view('posts.index');
+        $this->middleware('auth')->except(['index', 'show']);
     }
 
-    public function show()
+    public function index()
     {
-        return view('posts.show');
+        $posts = Post::latest()
+            ->filter(request(['month', 'year']))
+            ->get();
+
+        return view('posts.index', compact('posts'));
+    }
+
+    public function show(Post $post)
+    {
+        return view('posts.show', compact('post'));
     }
 
     public function create()
@@ -31,7 +40,8 @@ class PostsController extends Controller
 
         Post::create([
             'title' => request('title'),
-            'body' => request('body')
+            'body' => request('body'),
+            'user_id' => auth()->id()
         ]);
 
         return redirect('/');

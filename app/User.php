@@ -26,4 +26,17 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        if( \Hash::needsRehash($value) ) {
+            $value = \Hash::make($value);
+        }
+        $this->attributes['password'] = $value;
+    }
 }
